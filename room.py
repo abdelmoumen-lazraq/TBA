@@ -43,4 +43,6 @@ class Room:
 
     # Return a long description of this room including exits.
     def get_long_description(self):
-        return f"\nVous êtes dans {self.description}\n\n{self.get_exit_string()}\n"
+        valid_exits = list(self.exits.keys())
+        exits_text = ", ".join(valid_exits) if valid_exits else "Aucune sortie"
+        return f"\nVous êtes dans {self.description}\n\nSorties: {exits_text}\n"

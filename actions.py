@@ -54,7 +54,26 @@ class Actions:
             return False
 
         # Get the direction from the list of words.
-        direction = list_of_words[1]
+        raw_direction = list_of_words[1].strip()
+        d = raw_direction.lower()
+        # Dictionnaire des synonymes pour les directions
+        mapping = {"n": "N","nord": "N", "Nord": "N", "NORD": "N",
+                   "e": "E","est": "E", "Est": "E", "EST": "E",
+                   "s": "S","sud": "S", "Sud": "S", "SUD": "S",
+                   "o": "O","ouest": "O", "Ouest": "O", "OUEST": "O",
+                   "u": "U","up": "U", "haut": "U", "Haut": "U", "HAUT": "U",
+                   "d": "D","down": "D", "bas": "D", "Bas": "D", "BAS": "D", 
+        }     
+        # Conversion vers la direction canonique
+        if d in mapping:
+            direction = mapping[d]
+        else:
+            # Si ce n'est pas un mot connu, on tente juste en majuscule
+            direction = raw_direction.upper()
+        # If the direction is not valid, print an error message and return False.
+        if direction not in game.valid_directions:
+            print(f"\nDirection '{raw_direction}' invalide. Les directions valides sont: {', '.join(sorted(game.valid_directions))}.\n")
+            return False
         # Move the player in the direction specified by the parameter.
         player.move(direction)
         return True

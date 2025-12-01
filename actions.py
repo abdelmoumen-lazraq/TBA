@@ -54,20 +54,26 @@ class Actions:
             return False
 
         # Get the direction from the list of words.
-        direction = list_of_words[1]
-
-        # On s'assure d'abord que la direction choisie est correct.
-        n = 0
-        m = 0
-        for i in player.liste_directions.keys():
-            m += 1
-            if direction not in player.liste_directions[i]:
-                n += 1
-
-        if m == n:
-            print(f"\nDirection '{direction}' non reconnue.\n")
+        raw_direction = list_of_words[1].strip()
+        d = raw_direction.lower()
+        # Dictionnaire des synonymes pour les directions
+        mapping = {"n": "N","nord": "N", "Nord": "N", "NORD": "N",
+                   "e": "E","est": "E", "Est": "E", "EST": "E",
+                   "s": "S","sud": "S", "Sud": "S", "SUD": "S",
+                   "o": "O","ouest": "O", "Ouest": "O", "OUEST": "O",
+                   "u": "U","up": "U", "haut": "U", "Haut": "U", "HAUT": "U",
+                   "d": "D","down": "D", "bas": "D", "Bas": "D", "BAS": "D", 
+        }     
+        # Conversion vers la direction canonique
+        if d in mapping:
+            direction = mapping[d]
+        else:
+            # Si ce n'est pas un mot connu, on tente juste en majuscule
+            direction = raw_direction.upper()
+        # If the direction is not valid, print an error message and return False.
+        if direction not in game.valid_directions:
+            print(f"\nDirection '{raw_direction}' invalide. Les directions valides sont: {', '.join(sorted(game.valid_directions))}.\n")
             return False
-
         # Move the player in the direction specified by the parameter.
         player.move(direction)
         return True
@@ -149,43 +155,4 @@ class Actions:
         for command in game.commands.values():
             print("\t- " + str(command))
         print()
-        return True
-
-    def history(game, list_of_words, number_of_parameters):
-
-        # If the number of parameters is incorrect, print an error message and return False.
-        player = game.player
-        l = len(list_of_words)
-        if l != number_of_parameters + 1:
-            command_word = list_of_words[0]
-            print(MSG0.format(command_word=command_word))
-            return False
-        
-        player.get_history()
-        return True
-    
-    def Historique(game, list_of_words, number_of_parameters):
-
-        # If the number of parameters is incorrect, print an error message and return False.
-        player = game.player
-        l = len(list_of_words)
-        if l != number_of_parameters + 1:
-            command_word = list_of_words[0]
-            print(MSG0.format(command_word=command_word))
-            return False
-        
-        player.get_Historique()
-        return True
-    
-    def back(game, list_of_words, number_of_parameters):
-
-        # If the number of parameters is incorrect, print an error message and return False.
-        player = game.player
-        l = len(list_of_words)
-        if l != number_of_parameters + 1:
-            command_word = list_of_words[0]
-            print(MSG0.format(command_word=command_word))
-            return False
-        
-        player.move_back()
         return True

@@ -164,7 +164,7 @@ class Game:
 
         # Setup player and starting room
 
-        self.player = Player(input("\nEntrez votre nom: "))
+        self.player = Player(input("\nEntrez votre nom : "))
         self.player.current_room = entree_nord
         self.player.max_weight = 20
 

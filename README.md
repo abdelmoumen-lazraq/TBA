@@ -1,7 +1,7 @@
 ESIEE LOCKDOWN
-Quatre chiffres, un code, une école à sauver
+Quatre chiffres, un code, une école à sauver.
 
-Présentation du jeu
+Présentation du jeu :
 Une panne d’électricité générale a frappé l’ESIEE Paris.
 Toutes les portes se verrouillent automatiquement et les systèmes de sécurité empêchent toute sortie.
 

@@ -6,6 +6,7 @@ from room import Room
 from player import Player
 from command import Command
 from actions import Actions
+from item import Item
 
 class Game:
 
@@ -33,10 +34,18 @@ class Game:
         self.commands["Historique"] = Historique
         back = Command("back", " : retour à l'endroit précédemment visité (si possible)", Actions.back, 0)
         self.commands["back"] = back
+        check = Command("check", " : affiche l'inventaire des objets que vous avez ainsi que l'espace libre", Actions.check, 0)
+        self.commands["check"] = check
+        look = Command("look", " : affiche les objets présents dans la zone où vous vous trouvez", Actions.look, 0)
+        self.commands["look"] = look
+        take = Command("take", " : ramasse l'objet désigné, remplissant l'inventaire du joueur", Actions.take, 1)
+        self.commands["take"] = take
+        drop = Command("drop", " : sélectionne l'objet depuis l'inventaire et le dépose dans la zone actuelle", Actions.drop, 1)
+        self.commands["drop"] = drop
         
         # Setup rooms
 
-        entree_nord = Room("Entrée Nord","à l’entrée principale de l’ESIEE, devant l'axe de la terre,  où convergent étudiants et visiteurs.")
+        entree_nord = Room("Entrée Nord","à l’entrée principale de l’ESIEE, devant l'axe de la terre, où convergent étudiants et visiteurs.")
         self.rooms.append(entree_nord)
         entree_est = Room("Entrée Est","à l’entrée est, située juste à côté du RU CROUS, toujours animée aux heures de repas.")   
         self.rooms.append(entree_est)
@@ -150,8 +159,14 @@ class Game:
 
         # Setup player and starting room
 
+        papier_dechire = Item("papier déchiré", "petit papier où il semble y avoir quelque chose d'écrit...", 0.003)
+        entree_nord.inventory["papier déchiré"] = papier_dechire
+
+        # Setup player and starting room
+
         self.player = Player(input("\nEntrez votre nom: "))
         self.player.current_room = entree_nord
+        self.player.max_weight = 20
 
     # Play the game
     def play(self):

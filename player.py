@@ -32,6 +32,9 @@ class Player():
                                  "SE" : ["SE", "se", "Sud-Est", "SUD-EST", "sud-est"],
                                  "NO" : ["NO", "no", "Nord-Ouest", "NORD-OUEST", "nord-ouest"],
                                  "NE" : ["NE", "ne", "Nord-Est", "NORD-EST", "nord-est"]}
+        self.inventory = {}
+        self.max_weight = None
+        self.current_weight = 0
 
     # Define the move method.
     def move(self, direction):
@@ -94,13 +97,38 @@ class Player():
             return True
     
     def move_back(self):
-        for i in self.current_room.exits.keys():
-            if self.current_room.exits[i] == self.history[-1]:
+        # Cas 1 : aucun déplacement effectué
+        if not self.history:
+            print("\nVous n'avez visité aucune pièce.\n")
+            return False
+
+        previous_room = self.history[-1]
+
+    # Vérifier si le retour est possible depuis la pièce courante
+        for direction in self.current_room.exits:
+            if self.current_room.exits[direction] == previous_room:
                 self.current_room = self.history.pop()
                 print(self.current_room.get_long_description())
                 return True
-        
-        print("\nLa zone précédente n'est pas accessible par retour en arrière (sens unique notamment).\nL'historique sera effacé par conséquent.")
-        print("Il est cependant possible d'accéder à la liste des lieux déjà visités durant toute la partie avec la commande 'Historique'.\n")
+
+    # Cas sens unique : retour impossible
+        print(
+            "\nLa zone précédente n'est pas accessible par retour en arrière (sens unique notamment).\n"
+            "L'historique sera effacé par conséquent.\n"
+            "Il est cependant possible d'accéder à la liste des lieux déjà visités durant toute la partie "
+            "avec la commande 'Historique'.\n"
+        )
         self.history = []
         return False
+    
+    def get_inventory(self):
+        if self.inventory == {}:
+            print("\nVotre inventaire est vide.\n")
+            print(f"Espace de stockage disponible : {self.max_weight - self.current_weight} kg\n")
+            return False
+        else:
+            print("\nVous disposez des items suivants :")
+            for item in self.inventory.keys():
+                print("\t- " + str(self.inventory[item]))
+            print(f"\nEspace de stockage disponible : {self.max_weight - self.current_weight} kg\n")
+            return True

@@ -178,6 +178,13 @@ class Actions:
         return True
     
     def back(game, list_of_words, number_of_parameters):
+        if len(list_of_words) != number_of_parameters + 1:
+            print(MSG0.format(command_word=list_of_words[0]))
+            return False
+
+        return game.player.move_back()
+    
+    def check(game, list_of_words, number_of_parameters):
 
         # If the number of parameters is incorrect, print an error message and return False.
         player = game.player
@@ -187,5 +194,75 @@ class Actions:
             print(MSG0.format(command_word=command_word))
             return False
         
-        player.move_back()
+        player.get_inventory()
         return True
+    
+    def look(game, list_of_words, number_of_parameters):
+
+        # If the number of parameters is incorrect, print an error message and return False.
+        current_room = game.player.current_room
+        l = len(list_of_words)
+        if l != number_of_parameters + 1:
+            command_word = list_of_words[0]
+            print(MSG0.format(command_word=command_word))
+            return False
+        
+        print(current_room.get_long_description())
+        current_room.get_inventory()
+        return True
+    
+    def take(game, list_of_words, number_of_parameters):
+
+        # If the number of parameters is incorrect, print an error message and return False.
+        current_room = game.player.current_room
+        player = game.player
+        l = len(list_of_words)
+        objet_str = ""
+        # if l != number_of_parameters + 1:
+            # command_word = list_of_words[0]
+            # print(MSG1.format(command_word=command_word))
+            # return False
+        for i in range(1, l):
+            objet_str += list_of_words[i] + " "
+        objet_str = objet_str.rstrip()
+        objet = current_room.inventory[objet_str]
+        
+        if objet_str in current_room.inventory.keys() and objet.weight <= player.max_weight - player.current_weight:
+            player.inventory[objet_str] = current_room.inventory[objet_str]
+            del current_room.inventory[objet_str]
+            print(f"\nL'objet '{objet_str}' a été ramassé.\n")
+            player.current_weight = player.current_weight + objet.weight
+            return True
+        elif objet.weight > player.max_weight - player.current_weight:
+            print(f"\nL'objet '{objet_str}' surcharge l'inventaire. Vous ne pouvez actuellement pas le prendre.\n")
+            return False
+        else:
+            print("\nIl n'existe pas un tel objet dans cette zone.\n")
+            return False
+    
+    def drop(game, list_of_words, number_of_parameters):
+
+        # If the number of parameters is incorrect, print an error message and return False.
+        current_room = game.player.current_room
+        player = game.player
+        l = len(list_of_words)
+        objet_str = ""
+        # if l != number_of_parameters + 1:
+            # command_word = list_of_words[0]
+            # print(MSG1.format(command_word=command_word))
+            # return False
+        
+        for i in range(1, l):
+            objet_str += list_of_words[i] + " "
+        objet_str = objet_str.rstrip()
+        objet = player.inventory[objet_str]
+        
+        if objet_str in player.inventory.keys():
+            current_room.inventory[objet_str] = player.inventory[objet_str]
+            del player.inventory[objet_str]
+            print(f"\nL'objet '{objet_str}' a été déposé dans cette zone.\n")
+            player.current_weight = player.current_weight - objet.weight
+            return True
+        else:
+            print("\nVous ne possédez pas un tel objet dans votre inventaire.\n")
+            return False

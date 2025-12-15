@@ -178,11 +178,17 @@ class Actions:
         return True
     
     def back(game, list_of_words, number_of_parameters):
-        if len(list_of_words) != number_of_parameters + 1:
-            print(MSG0.format(command_word=list_of_words[0]))
-            return False
 
-        return game.player.move_back()
+        # If the number of parameters is incorrect, print an error message and return False.
+        player = game.player
+        l = len(list_of_words)
+        if l != number_of_parameters + 1:
+            command_word = list_of_words[0]
+            print(MSG0.format(command_word=command_word))
+            return False
+        
+        player.move_back()
+        return True
     
     def check(game, list_of_words, number_of_parameters):
 

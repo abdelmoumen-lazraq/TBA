@@ -97,27 +97,18 @@ class Player():
             return True
     
     def move_back(self):
-        # Cas 1 : aucun déplacement effectué
-        if not self.history:
-            print("\nVous n'avez visité aucune pièce.\n")
+        if self.history == []:
+            print("\nVous n'avez pas de lieux accessibles avec cette commande\n")
             return False
-
-        previous_room = self.history[-1]
-
-    # Vérifier si le retour est possible depuis la pièce courante
-        for direction in self.current_room.exits:
-            if self.current_room.exits[direction] == previous_room:
+        
+        for i in self.current_room.exits.keys():
+            if self.current_room.exits[i] == self.history[-1]:
                 self.current_room = self.history.pop()
                 print(self.current_room.get_long_description())
                 return True
 
-    # Cas sens unique : retour impossible
-        print(
-            "\nLa zone précédente n'est pas accessible par retour en arrière (sens unique notamment).\n"
-            "L'historique sera effacé par conséquent.\n"
-            "Il est cependant possible d'accéder à la liste des lieux déjà visités durant toute la partie "
-            "avec la commande 'Historique'.\n"
-        )
+        print("\nLa zone précédente n'est pas accessible par retour en arrière (sens unique notamment).\nL'historique sera effacé par conséquent.")
+        print("Il est cependant possible d'accéder à la liste des lieux déjà visités durant toute la partie avec la commande 'Historique'.\n")
         self.history = []
         return False
     

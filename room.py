@@ -23,7 +23,7 @@ class Room:
         self.description = description
         self.exits = {}
         self.inventory = {}
-        self.character = {}
+        self.characters = []
     
     # Define the get_exit method.
     def get_exit(self, direction):
@@ -46,26 +46,23 @@ class Room:
     # Return a long description of this room including exits.
     def get_long_description(self):
         return f"\nVous êtes {self.description}\n\n{self.get_exit_string()}\n"
-    
 
+    # Display the content of the room (items + PNJ)
     def get_inventory(self):
-        if self.inventory == {}:
+        # La salle est vide uniquement si elle ne contient ni objets ni PNJ
+        if not self.inventory and not self.characters:
             print("\nIl n'y a rien ici.\n")
             return False
-        else:
-            print("\nLa pièce contient :")
-            for item in self.inventory.keys():
-                print("\t- " + str(self.inventory[item]))
-            print()
-            return True
-    
-    def get_character(self):
-        if self.character == {}:
-            print("\nIl n'y a personne ici.\n")
-            return False
-        else:
-            print("\nVous voyez :")
-            for pnj in self.character.keys():
-                print("\t- " + str(self.character[pnj]))
-            print()
-            return True
+
+        print("\nOn voit:")
+
+        # Affichage des objets
+        for item in self.inventory.values():
+            print("\t- " + str(item))
+
+        # Affichage des personnages non joueurs
+        for character in self.characters:
+            print("\t- " + str(character))
+
+        print()
+        return True

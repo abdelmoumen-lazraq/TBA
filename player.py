@@ -49,7 +49,6 @@ class Player():
         except KeyError:
             next_room = None
 
-        # Petit bonus lorsque le joueur essaie de quitter la zone jouable
         if self.current_room.name == "Entrée Nord" and direction in ["NO", "N", "NE"]:
             print("\nQue faites-vous ? Vous avez des gens à sauver et ils ne sont pas dans cette direction !\n")
             return False
@@ -65,12 +64,10 @@ class Player():
             print("\nAucune porte dans cette direction !\n")
             return False
         
-        # Remplie les deux historiques des zones visitées
+        # Set the current room to the next room.
         self.history.append(self.current_room)
         if self.current_room not in self.Historique:
             self.Historique.append(self.current_room)
-
-        # Set the current room to the next room.
         self.current_room = next_room
         print(self.current_room.get_long_description())
     #    self.get_history()

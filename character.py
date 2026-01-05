@@ -1,40 +1,52 @@
-
-from room import Room
-import random as random
+import random
+DEBUG = False
 
 class Character:
-
-    # DEBUG = None
-    def __init__(self, name, description, current_room):
+    def __init__(self, name, description, current_room, msgs):
         self.name = name
         self.description = description
         self.current_room = current_room
-        self.msgs = {}
-    
+        self.msgs = msgs[:]  
+
     def __str__(self):
-        return  self.name \
-                + " : " \
-                + self.description
-    
+        return f"{self.name} : {self.description}"
+
     def move(self):
-        current_room = self.current_room
-        a = random.choice([1,2])
-        print(a)
-        from game import DEBUG
-        if a == 1:
-            if DEBUG:
-                print(f"DEBUG : {self.name} n'a pas bougé et se trouve dans la zone '{self.current_room.name}'\n")
-            return False
+        """
+        Déplace le PNJ avec une chance sur deux
+        vers une salle adjacente choisie au hasard.
+        """
+        if random.choice([True, False]):
+            possible_rooms = [
+                room for room in self.current_room.exits.values()
+                if room is not None
+            ]
 
-        else:
-            liste_sorties = []
-            for i in current_room.exits.keys():
-                liste_sorties.append(current_room.exits[i])
+            if possible_rooms:
+                old_room = self.current_room
+                new_room = random.choice(possible_rooms)
 
-            print(liste_sorties)
-            next_room = random.choice(liste_sorties)
-            current_room = next_room
-            if DEBUG:
-                print(f"DEBUG : {self.name} se trouve dans la zone '{self.current_room.name}'\n")
-            return True
+                old_room.characters.remove(self)
+                new_room.characters.append(self)
+                self.current_room = new_room
 
+                if DEBUG:
+                    print(
+                        f"[DEBUG] {self.name} s'est déplacé de "
+                        f"{old_room.name} à {new_room.name}."
+                    )
+
+                return True
+        return False
+    def get_msg(self):
+        """
+        Retourne un message du PNJ de manière cyclique.
+        """
+        if not self.msgs:
+            return ""
+
+        msg = self.msgs.pop(0)
+        self.msgs.append(msg)
+        return msg
+    #On peut fixer le message du PNJ à une condition spécifique puis le message va changer en fonction de cette condition.
+    # Changer la salle initiale du joueur afin d'eviter de se déplacer à chaque test dès le début

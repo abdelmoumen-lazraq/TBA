@@ -7,6 +7,9 @@ from player import Player
 from command import Command
 from actions import Actions
 from item import Item
+from character import Character
+
+DEBUG = True
 
 class Game:
 
@@ -16,6 +19,7 @@ class Game:
         self.rooms = []
         self.commands = {}
         self.player = None
+        self.character = {}
     
     # Setup the game
     def setup(self):
@@ -157,16 +161,28 @@ class Game:
         epie6_etage2.exits = {"U" : epie6_etage3, "D" : epie6_etage1}
         epie6_etage3.exits = {"E" : epie6, "D" : epie6_etage2}
 
-        # Setup player and starting room
+        # Setup items
 
         papier_dechire = Item("papier déchiré", "petit papier où il semble y avoir quelque chose d'écrit...", 0.003)
         entree_nord.inventory["papier déchiré"] = papier_dechire
 
+        # Setup characters
+
+        cody = Character("Cody", "un petit robot semblant fonctionner par IA", entree_nord)
+        cody.msgs["présentation"] = "Bip Bip Bonjour, je suis Cody, je suis une intelligence artificielle" \
+        "\nJ'aurais besoin de ton aide pour régler cette énorme panne avant que ça n'empire et que ça devienne dangereux pour les personnes bloquées à l'intérieur Bip Bip."
+        entree_nord.character["Cody"] = cody
+        self.character["Cody"] = cody
+
         # Setup player and starting room
 
-        self.player = Player(input("\nEntrez votre nom : "))
+        self.player = Player(input("\nEntrez votre nom: "))
         self.player.current_room = entree_nord
         self.player.max_weight = 20
+
+        # Setup debug variable (bool)
+
+        # DEBUG = True
 
     # Play the game
     def play(self):
@@ -176,6 +192,7 @@ class Game:
         while not self.finished:
             # Get the command from the player
             self.process_command(input("> "))
+            self.character["Cody"].move()
         return None
 
     # Process the command entered by the player

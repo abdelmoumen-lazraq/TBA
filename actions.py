@@ -46,6 +46,7 @@ class Actions:
         """
         
         player = game.player
+        PNJ_cody = game.character["Cody"]
         l = len(list_of_words)
         # If the number of parameters is incorrect, print an error message and return False.
         if l != number_of_parameters + 1:
@@ -70,6 +71,7 @@ class Actions:
 
         # Move the player in the direction specified by the parameter.
         player.move(direction)
+        PNJ_cody.move()
         return True
 
     def quit(game, list_of_words, number_of_parameters):
@@ -215,6 +217,7 @@ class Actions:
         
         print(current_room.get_long_description())
         current_room.get_inventory()
+        current_room.get_character()
         return True
     
     def take(game, list_of_words, number_of_parameters):

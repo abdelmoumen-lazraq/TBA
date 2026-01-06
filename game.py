@@ -1,7 +1,6 @@
 # Description: Game class
 
 # Import modules
-DEBUG = True
 
 from room import Room
 from player import Player
@@ -9,8 +8,8 @@ from command import Command
 from actions import Actions
 from item import Item
 from character import Character
-import character
-character.DEBUG = DEBUG
+
+DEBUG = True
 
 class Game:
 
@@ -20,7 +19,8 @@ class Game:
         self.rooms = []
         self.commands = {}
         self.player = None
-    
+        self.character = {}
+
     # Setup the game
     def setup(self):
 
@@ -46,12 +46,12 @@ class Game:
         self.commands["take"] = take
         drop = Command("drop", " : sélectionne l'objet depuis l'inventaire et le dépose dans la zone actuelle", Actions.drop, 1)
         self.commands["drop"] = drop
-        talk = Command("talk", " : parler", Actions.talk, 1)
+        talk = Command("talk", " : permet d'engager la discussion avec le PNJ sélectionné en paramètre", Actions.talk, 1)
         self.commands["talk"] = talk
         
         # Setup rooms
 
-        entree_nord = Room("Entrée Nord","à l’entrée principale de l’ESIEE, devant l'axe de la terre, où convergent étudiants et visiteurs.")
+        entree_nord = Room("Entrée Nord","à l’entrée principale de l’ESIEE (entrée nord), devant l'axe de la terre, où convergent étudiants et visiteurs.")
         self.rooms.append(entree_nord)
         entree_est = Room("Entrée Est","à l’entrée est, située juste à côté du RU CROUS, toujours animée aux heures de repas.")   
         self.rooms.append(entree_est)
@@ -163,40 +163,28 @@ class Game:
         epie6_etage2.exits = {"U" : epie6_etage3, "D" : epie6_etage1}
         epie6_etage3.exits = {"E" : epie6, "D" : epie6_etage2}
 
-        # Setup player and starting room
+        # Setup items
 
         papier_dechire = Item("papier déchiré", "petit papier où il semble y avoir quelque chose d'écrit...", 0.003)
         entree_nord.inventory["papier déchiré"] = papier_dechire
 
+        # Setup characters
+
+        cody = Character("Cody", "un petit robot semblant fonctionner par IA", entree_nord)
+        cody.msgs["Premier message"] = "Bip Bip Bonjour, je suis Cody, je suis une intelligence artificielle" \
+        "\nJ'aurais besoin de ton aide pour régler cette énorme panne avant que ça n'empire et que ça devienne dangereux pour les personnes bloquées à l'intérieur Bip Bip."
+        cody.msgs["Présentation"] = "Bip Bip Bonjour, je suis Cody, je suis une intelligence artificielle"
+        cody.msgs["Requête"] = "J'aurais besoin de ton aide pour régler cette énorme panne avant que ça n'empire et que ça devienne dangereux pour les personnes bloquées à l'intérieur Bip Bip."
+        entree_nord.character["Cody"] = cody
+        self.character["Cody"] = cody
+
         # Setup player and starting room
 
-        self.player = Player(input("\nEntrez votre nom : "))
+        self.player = Player(input("\nEntrez votre nom: "))
         self.player.current_room = entree_nord
         self.player.max_weight = 20
 
-        # Setup characters
-        professeur = Character(
-            "Professeur",
-            "un enseignant stressé qui cherche une sortie",
-            bibliotheque,
-            [
-                "Le système est bloqué…",
-                "Un chiffre du code est caché quelque part."
-            ]
-        )
 
-
-        agent = Character(
-            "Agent",
-            "un agent de sécurité qui patrouille",
-            hall,
-            [
-                "Toutes les portes sont verrouillées.",
-                "Je n'ai pas accès au système central."
-            ]
-        )
-        bibliotheque.characters.append(professeur)
-        hall.characters.append(agent)
     # Play the game
     def play(self):
         self.setup()
@@ -223,11 +211,7 @@ class Game:
         else:
             command = self.commands[command_word]
             command.action(self, list_of_words, command.number_of_parameters)
-        # Déplacement des PNJ après chaque commande du joueur
-        for room in self.rooms:
-            for character in room.characters[:]:
-                character.move()
-        
+
     # Print the welcome message
     def print_welcome(self):
         print(f"\nBienvenue {self.player.name} dans ce jeu d'aventure !")

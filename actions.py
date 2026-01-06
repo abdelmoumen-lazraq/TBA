@@ -46,6 +46,7 @@ class Actions:
         """
         
         player = game.player
+        PNJ_cody = game.character["Cody"]
         l = len(list_of_words)
         # If the number of parameters is incorrect, print an error message and return False.
         if l != number_of_parameters + 1:
@@ -70,6 +71,7 @@ class Actions:
 
         # Move the player in the direction specified by the parameter.
         player.move(direction)
+        PNJ_cody.move()
         return True
 
     def quit(game, list_of_words, number_of_parameters):
@@ -215,6 +217,7 @@ class Actions:
         
         print(current_room.get_long_description())
         current_room.get_inventory()
+        current_room.get_character()
         return True
     
     def take(game, list_of_words, number_of_parameters):
@@ -224,10 +227,12 @@ class Actions:
         player = game.player
         l = len(list_of_words)
         objet_str = ""
-        # if l != number_of_parameters + 1:
-            # command_word = list_of_words[0]
-            # print(MSG1.format(command_word=command_word))
-            # return False
+        
+        if l <= number_of_parameters :
+            command_word = list_of_words[0]
+            print(MSG1.format(command_word=command_word))
+            return False
+
         for i in range(1, l):
             objet_str += list_of_words[i] + " "
         objet_str = objet_str.rstrip()
@@ -253,10 +258,11 @@ class Actions:
         player = game.player
         l = len(list_of_words)
         objet_str = ""
-        # if l != number_of_parameters + 1:
-            # command_word = list_of_words[0]
-            # print(MSG1.format(command_word=command_word))
-            # return False
+
+        if l <= number_of_parameters :
+            command_word = list_of_words[0]
+            print(MSG1.format(command_word=command_word))
+            return False
         
         for i in range(1, l):
             objet_str += list_of_words[i] + " "
@@ -272,25 +278,26 @@ class Actions:
         else:
             print("\nVous ne possédez pas un tel objet dans votre inventaire.\n")
             return False
+    
     def talk(game, list_of_words, number_of_parameters):
-        # Vérifier le nombre de paramètres
-        if len(list_of_words) != number_of_parameters + 1:
+        player = game.player
+        current_room = player.current_room
+        l = len(list_of_words)
+        PNJ_str = ""
+
+        if l <= number_of_parameters :
             command_word = list_of_words[0]
             print(MSG1.format(command_word=command_word))
             return False
 
-        target_name = list_of_words[1].lower()
-        room = game.player.current_room
+        for i in range(1, l):
+            PNJ_str += list_of_words[i] + " "
+        PNJ_str = PNJ_str.rstrip()
 
-        # Chercher le PNJ dans la salle courante
-        for character in room.characters:
-            if character.name.lower() == target_name:
-                msg = character.get_msg()
-                if msg:
-                    print("\n" + msg + "\n")
-                else:
-                    print("\nCe personnage n’a rien à dire.\n")
-                return True
-
-        print(f"\nIl n’y a personne nommé '{target_name}' ici.\n")
-        return False
+        if PNJ_str not in current_room.character.keys():
+            print(f"\nCe PNJ n'est pas dans la pièce.\n")
+            return False
+        else:
+            PNJ = current_room.character[PNJ_str]
+            PNJ.talk()
+            return True

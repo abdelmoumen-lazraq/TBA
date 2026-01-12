@@ -1,8 +1,8 @@
-print(">>> PLAYER.PY CHARGÉ <<<")
-# Define the Player class.
+"""Define the Player class."""
 
 from room import Room
 from quest import QuestManager
+
 class Player():
     """
     This Class represents a player. A player is composed of a name and a current room where he is.
@@ -38,8 +38,8 @@ class Player():
         self.current_weight = 0
         self.move_count = 0
         self.quest_manager = QuestManager(self)
-        self.rewards = []
-
+        self.rewards = []  # List to store earned rewards
+        self.game = None
 
     # Define the move method.
     def move(self, direction):
@@ -78,10 +78,28 @@ class Player():
         # Set the current room to the next room.
         self.current_room = next_room
         print(self.current_room.get_long_description())
-    #    self.get_history()
-    #    self.get_Historique()
+        if next_room.name == "Salle blanche":
+            print("\n   GAME OVER")
+            print("\nVous avez été électrocuté en rentrant dans la Salle Blanche")
+            print("L'instabilité du courant n'a pas été réglée et vous a couté la vie\n")
+            self.game.finished = True
+            return False
+
+
+
+        # Check room visit objectives
+        self.quest_manager.check_room_objectives(self.current_room.name)
+
+        # Increment move counter and check movement objectives
         self.move_count += 1
+        self.quest_manager.check_counter_objectives("Se déplacer", self.move_count)
+
         return True
+    
+    def ramasse_papier(self, objet):
+        self.quest_manager.check_action_objectives("Ramasser", objet)
+        return None
+
 
     def get_history(self):
         if self.history == []:
@@ -132,17 +150,59 @@ class Player():
                 print("\t- " + str(self.inventory[item]))
             print(f"\nEspace de stockage disponible : {self.max_weight - self.current_weight} kg\n")
             return True
-        
+
+
+
     def add_reward(self, reward):
-        """Add a reward to the player."""
-        self.rewards.append(reward)
+        """
+        Add a reward to the player's rewards list.
+        
+        Args:
+            reward (str): The reward to add.
+            
+        Examples:
+        
+        >>> player = Player("Bob")
+        >>> player.add_reward("Épée magique") # doctest: +NORMALIZE_WHITESPACE
+        <BLANKLINE>
+        🎁 Vous avez obtenu: Épée magique
+        <BLANKLINE>
+        >>> "Épée magique" in player.rewards
+        True
+        >>> player.add_reward("Épée magique") # Adding same reward again
+        >>> len(player.rewards)
+        1
+        """
+        if reward and reward not in self.rewards:
+            self.rewards.append(reward)
+            print(f"\n🎁 Vous avez obtenu: {reward}\n")
+
 
     def show_rewards(self):
-        """Display all rewards earned by the player."""
+        """
+        Display all rewards earned by the player.
+        
+        Examples:
+        
+        >>> player = Player("Charlie")
+        >>> player.show_rewards() # doctest: +NORMALIZE_WHITESPACE
+        <BLANKLINE>
+        🎁 Aucune récompense obtenue pour le moment.
+        <BLANKLINE>
+        >>> player.add_reward("Bouclier d'or") # doctest: +NORMALIZE_WHITESPACE
+        <BLANKLINE>
+        🎁 Vous avez obtenu: Bouclier d'or
+        <BLANKLINE>
+        >>> player.show_rewards() # doctest: +NORMALIZE_WHITESPACE
+        <BLANKLINE>
+        🎁 Vos récompenses:
+        • Bouclier d'or
+        <BLANKLINE>
+        """
         if not self.rewards:
             print("\n🎁 Aucune récompense obtenue pour le moment.\n")
         else:
-            print("\n🎁 Récompenses obtenues :")
+            print("\n🎁 Vos récompenses:")
             for reward in self.rewards:
-                print(f"  - {reward}")
+                print(f"  • {reward}")
             print()

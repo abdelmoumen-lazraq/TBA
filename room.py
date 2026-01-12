@@ -40,7 +40,6 @@ class Room:
         for exit in self.exits.keys():
             if self.exits.get(exit) is not None:
                 exit_string += "\n\t- " + exit + f" : {self.exits[exit].name}"
-        # exit_string = exit_string.strip(", ")
         return exit_string
 
     # Return a long description of this room including exits.

@@ -1,4 +1,4 @@
-# This file contains the Command class.
+"""This file contains the Command class"""
 
 class Command:
     """
@@ -16,7 +16,7 @@ class Command:
 
     Examples:
 
-    >>> from actions import go
+    >>> from actions import Actions
     >>> command = Command("go", "Permet de se déplacer dans une direction.", go, 1)
     >>> command.command_word
     'go'
@@ -35,11 +35,8 @@ class Command:
         self.help_string = help_string
         self.action = action
         self.number_of_parameters = number_of_parameters
-    
+
     # The string representation of the command.
     def __str__(self):
         return  self.command_word \
                 + self.help_string
-    
-
-

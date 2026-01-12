@@ -1,4 +1,4 @@
-# Description: Game class
+"""Game class"""
 
 # Import modules
 
@@ -10,10 +10,12 @@ from item import Item
 from character import Character
 from quest import Quest
 
+import random as random
 
 DEBUG = True
 
 class Game:
+    """The Game class manages the overall game state and flow."""
 
     # Constructor
     def __init__(self):
@@ -22,46 +24,81 @@ class Game:
         self.commands = {}
         self.player = None
         self.character = {}
-        
 
     # Setup the game
     def setup(self):
 
+        self._set_up_all()
+        self._setup_quests()
+    
+    def _set_up_all(self):
+
         # Setup commands
 
-        help = Command("help", " : afficher cette aide", Actions.help, 0)
-        self.commands["help"] = help
-        quit = Command("quit", " : quitter le jeu", Actions.quit, 0)
-        self.commands["quit"] = quit
-        go = Command("go", " <direction> : se déplacer dans une direction, que ce soit dans une des directions cardinales ou bien monter/déscendre ou alors une direction bien précise", Actions.go, 1)
-        self.commands["go"] = go
-        history = Command("history", " : affiche l'historique des endroits visités dans l'ordre de visite (peut inclure des répétitions)", Actions.history, 0)
-        self.commands["history"] = history
-        Historique = Command("Historique", " : affiche l'historique de tous les endroits visités durant la partie sans doublons (historique non effaçable)", Actions.Historique, 0)
-        self.commands["Historique"] = Historique
-        back = Command("back", " : retour à l'endroit précédemment visité (si possible)", Actions.back, 0)
-        self.commands["back"] = back
-        check = Command("check", " : affiche l'inventaire des objets que vous avez ainsi que l'espace libre", Actions.check, 0)
-        self.commands["check"] = check
-        look = Command("look", " : affiche les objets présents dans la zone où vous vous trouvez", Actions.look, 0)
-        self.commands["look"] = look
-        take = Command("take", " : ramasse l'objet désigné, remplissant l'inventaire du joueur", Actions.take, 1)
-        self.commands["take"] = take
-        drop = Command("drop", " : sélectionne l'objet depuis l'inventaire et le dépose dans la zone actuelle", Actions.drop, 1)
-        self.commands["drop"] = drop
-        talk = Command("talk", " : permet d'engager la discussion avec le PNJ sélectionné en paramètre", Actions.talk, 1)
-        self.commands["talk"] = talk
-        quests = Command("quests", " : afficher la liste des quêtes", Actions.quests, 0)
-        self.commands["quests"] = quests
+        self.commands["help"] = Command("help",
+                                        " : afficher cette aide",
+                                        Actions.help,
+                                        0)
+        self.commands["quit"] = Command("quit",
+                                        " : quitter le jeu",
+                                        Actions.quit,
+                                        0)
+        self.commands["go"] = Command("go",
+                                      " <direction> : se déplacer dans une direction, que ce soit dans une des directions cardinales ou bien monter/déscendre ou alors une direction bien précise",
+                                      Actions.go,
+                                      1)
+        self.commands["history"] = Command("history",
+                                           " : affiche l'historique des endroits visités dans l'ordre de visite (peut inclure des répétitions)",
+                                           Actions.history,
+                                           0)
+        self.commands["Historique"] = Command("Historique",
+                                              " : affiche l'historique de tous les endroits visités durant la partie sans doublons (historique non effaçable)",
+                                              Actions.Historique,
+                                              0)
+        self.commands["back"] = Command("back",
+                                        " : retour à l'endroit précédemment visité (si possible)",
+                                        Actions.back,
+                                        0)
+        self.commands["check"] = Command("check",
+                                         " : affiche l'inventaire des objets que vous avez ainsi que l'espace libre",
+                                         Actions.check,
+                                         0)
+        self.commands["look"] = Command("look",
+                                        " : affiche les objets présents dans la zone où vous vous trouvez",
+                                        Actions.look,
+                                        0)
+        self.commands["take"] = Command("take",
+                                        " <objet> : ramasse l'objet désigné, remplissant l'inventaire du joueur",
+                                        Actions.take,
+                                        1)
+        self.commands["drop"] = Command("drop",
+                                        " <objet> : sélectionne l'objet depuis l'inventaire et le dépose dans la zone actuelle",
+                                        Actions.drop,
+                                        1)
+        self.commands["talk"] = Command("talk",
+                                        " <pnj> : permet d'engager la discussion avec le PNJ sélectionné en paramètre",
+                                        Actions.talk,
+                                        1)
 
-        quest = Command("quest", " <titre> : afficher les détails d'une quête", Actions.quest, 1)
-        self.commands["quest"] = quest
 
-        activate = Command("activate", " <titre> : activer une quête", Actions.activate, 1)
-        self.commands["activate"] = activate
-
-        rewards = Command("rewards", " : afficher vos récompenses", Actions.rewards, 0)
-        self.commands["rewards"] = rewards
+        self.commands["quests"] = Command("quests"
+                                          , " : afficher la liste des quêtes"
+                                          , Actions.quests
+                                          , 0)
+        self.commands["quest"] = Command("quest"
+                                         , " <titre> : afficher les détails d'une quête"
+                                         , Actions.quest
+                                         , 1)
+        self.commands["activate"] = Command("activate"
+                                            , " <titre> : activer une quête"
+                                            , Actions.activate
+                                            , 1)
+        self.commands["rewards"] = Command("rewards"
+                                           , " : afficher vos récompenses"
+                                           , Actions.rewards
+                                           , 0)
+        
+        
         # Setup rooms
 
         entree_nord = Room("Entrée Nord","à l’entrée principale de l’ESIEE (entrée nord), devant l'axe de la terre, où convergent étudiants et visiteurs.")
@@ -178,8 +215,9 @@ class Game:
 
         # Setup items
 
-        papier_dechire = Item("papier déchiré", "petit papier où il semble y avoir quelque chose d'écrit...", 0.003)
-        entree_nord.inventory["papier déchiré"] = papier_dechire
+        entree_nord.inventory["papier déchiré N°1"] = Item("papier déchiré N°1", "petit papier où il semble y avoir quelque chose d'écrit...", 0.003)
+        entree_ouest.inventory["papier déchiré N°2"] = Item("papier déchiré N°2", "petit papier où il semble y avoir quelque chose d'écrit...", 0.003)
+        
 
         # Setup characters
 
@@ -188,45 +226,64 @@ class Game:
         "\nJ'aurais besoin de ton aide pour régler cette énorme panne avant que ça n'empire et que ça devienne dangereux pour les personnes bloquées à l'intérieur Bip Bip."
         cody.msgs["Présentation"] = "Bip Bip Bonjour, je suis Cody, je suis une intelligence artificielle"
         cody.msgs["Requête"] = "J'aurais besoin de ton aide pour régler cette énorme panne avant que ça n'empire et que ça devienne dangereux pour les personnes bloquées à l'intérieur Bip Bip."
+        cody.msgs["Avertissement"] = "Attention, ne va pas dans la Salle Blanche, elle est trop instable, tu risque une électrocution"
+        cody.proba_déplacement = [1,2,3,4,5,6]
         entree_nord.character["Cody"] = cody
         self.character["Cody"] = cody
+        
 
         # Setup player and starting room
 
         self.player = Player(input("\nEntrez votre nom: "))
         self.player.current_room = entree_nord
         self.player.max_weight = 20
+        self.player.game = self
 
-        self._setup_quests()  
+        self.player.quest_manager.character["Cody"] = cody
+        cody.player = self.player
+
 
     def _setup_quests(self):
         """Initialize all quests."""
         exploration_quest = Quest(
-            title="Explorateur de l'ESIEE",
-            description="Explorez les lieux principaux de l'école.",
-            objectives=["Visiter Entrée Nord",
-                        "Visiter Hall d'accueil",
-                        "Visiter Bibliothèque"],
-            reward="Badge Explorateur"
+            title="Grand Explorateur",
+            description="Explorez tous les lieux de ce monde mystérieux.",
+            objectives=["Visiter Hall d'accueil"
+                        , "Visiter Entrée Est"
+                        , "Visiter Entrée Ouest"],
+            reward="Titre de Grand Explorateur"
         )
 
-        interaction_quest = Quest(
-            title="Parler à Cody",
-            description="Engager la discussion avec Cody.",
-            objectives=["parler avec Cody"],
-            reward="Information secrète"
+        paper_grab_quest = Quest(
+            title="Papier perdu",
+            description="Récoltez des bouts de papier déchirés numérotés",
+            objectives=["Ramasser le papier déchiré N°1"
+                        , "Ramasser le papier déchiré N°2"],
         )
 
-        item_quest = Quest(
-            title="Message mystérieux",
-            description="Récupérer le papier déchiré.",
-            objectives=["prendre papier déchiré"],
-            reward="Indice important"
-        )
+        # travel_quest = Quest(
+            # title="Grand Voyageur",
+            # description="Déplacez-vous 10 fois entre les lieux.",
+            # objectives=["Se déplacer 10 fois"],
+            # reward="Bottes de voyageur"
+        # )
 
+        # discovery_quest = Quest(
+        #     title="Découvreur de Secrets",
+        #     description="Découvrez les trois lieux les plus mystérieux.",
+        #     objectives=["Visiter Cave"
+        #                 , "Visiter Tower"
+        #                 , "Visiter Castle"],
+        #     reward="Clé dorée"
+        # )
+
+        # Add quests to player's quest manager
         self.player.quest_manager.add_quest(exploration_quest)
-        self.player.quest_manager.add_quest(interaction_quest)
-        self.player.quest_manager.add_quest(item_quest)
+        # self.player.quest_manager.add_quest(travel_quest)
+        # self.player.quest_manager.add_quest(discovery_quest)
+        self.player.quest_manager.add_quest(paper_grab_quest)
+
+
     # Play the game
     def play(self):
         """Main game loop."""
@@ -237,26 +294,7 @@ class Game:
         while not self.finished:
             # Get the command from the player
             self.process_command(input("> "))
-            if self.loose():
-                print("\n💀 Vous avez perdu la partie. Essayez de nouveau !\n")
-                self.finished = True
-
-            elif self.win():
-                print("\nFélicitations ! Vous avez accompli toutes les quêtes du jeu et sauvé l'école !\n")
-                self.finished = True
-    def win(self):
-        """Return True if all quests are completed."""
-        return self.player.quest_manager.all_quests_completed()
-    
-    def loose(self):
-        """Return True if defeat conditions are met."""
-        if self.player.current_room.name == "Salle blanche":
-            if "papier déchiré" not in self.player.inventory:
-                print("\n💀 Vous êtes entré dans la salle blanche sans l’indice nécessaire.")
-                return True
-        return False
-
-
+        return None
 
     # Process the command entered by the player
     def process_command(self, command_string) -> None:
@@ -268,15 +306,13 @@ class Game:
         command_word = list_of_words[0]
 
         # If the command is not recognized, print an error message
-        if command_word not in self.commands:
-            msg1 = f"\nCommande '{command_word}' non reconnue."
-            msg2 = " Entrez 'help' pour voir la liste des commandes disponibles.\n"
-            print(msg1 + msg2)
+        if command_word not in self.commands.keys():
+            if command_word != "":
+                print(f"\nCommande '{command_word}' non reconnue. Entrez 'help' pour voir la liste des commandes disponibles.\n")
         # If the command is recognized, execute it
         else:
             command = self.commands[command_word]
             command.action(self, list_of_words, command.number_of_parameters)
-
 
     # Print the welcome message
     def print_welcome(self):
@@ -284,14 +320,15 @@ class Game:
 
         print(f"\nBienvenue {self.player.name} dans ce jeu d'aventure !")
         print("Entrez 'help' si vous avez besoin d'aide.")
-
+        #
         print(self.player.current_room.get_long_description())
+
     
 
 def main():
     """Create a game object and play the game"""
     Game().play()
-
+    
 
 if __name__ == "__main__":
     main()

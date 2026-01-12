@@ -1,5 +1,9 @@
 """ Define the Quest class"""
 
+from character import Character
+# from passerelle import cody
+
+
 class Quest:
     """
     This class represents a quest in the game. A quest has a title, description,
@@ -132,6 +136,10 @@ class Quest:
                 if player:
                     player.add_reward(self.reward)
             print()
+        
+            if self.title == "Papier perdu":
+                player.quest_manager.papier_perdu_next(player)
+        player.quest_manager.check_win()
 
 
     def get_status(self):
@@ -309,7 +317,8 @@ class Quest:
                 f"{action} {target}",
                 f"{action} avec {target}",
                 f"{action} le {target}",
-                f"{action} la {target}"
+                f"{action} la {target}",
+                f"{action} à {target}"
             ]
         else:
             objective_variations = [action]
@@ -377,6 +386,28 @@ class Quest:
         return self.get_status()
 
 
+##################################################
+#          Quêtes en plusieurs parties           #
+##################################################
+
+# def papier_perdu_next():
+#     Cody_talking_quest_1 = Quest(
+#             title="Déchiffrage",
+#             description="Parlez à Cody pour déchiffrer le message",
+#             objectives=["Parler à Cody"],
+#             reward="Code déchiffré"
+#         )
+#     player_quest_manager = 
+#     QuestManager.add_quest(QuestManager, Cody_talking_quest_1)
+#     QuestManager.activate_quest(Cody_talking_quest_1)
+#     print(f"\n❗Nouvelle quête reçue ({Cody_talking_quest_1.title}) : consultez votre compendium de quête\n")
+#     Character.add_quest_Cody(1)
+
+
+##################################################
+#                  2nd Class                     #
+##################################################
+
 class QuestManager:
     """
     This class manages all quests in the game.
@@ -406,6 +437,7 @@ class QuestManager:
         self.quests = []
         self.active_quests = []
         self.player = player
+        self.character = {}
 
 
     def add_quest(self, quest):
@@ -737,10 +769,33 @@ class QuestManager:
             print(quest.get_details(current_counts))
         else:
             print(f"\nQuête '{quest_title}' non trouvée.\n")
-
-    def all_quests_completed(self):
-        """Return True if all quests are completed."""
+    
+    def check_win(self):
+        v = 0
         for quest in self.quests:
-            if not quest.is_completed:
-                return False
-        return True
+            if quest.is_completed:
+                v += 1
+        if v == len(self.quests):
+            print("\n#   VICTOIRE   #\n")
+            print("Vous avez gagné en terminant toutes les quêtes du jeu\n")
+            print("Merci d'avoir joué\n")
+            self.player.game.finished = True
+            return True
+        return False
+
+
+##################################################
+#          Quêtes en plusieurs parties           #
+##################################################
+
+    def papier_perdu_next(self, player=None):
+        Cody_talking_quest_1 = Quest(
+                title="Déchiffrage",
+                description="Parlez à Cody pour déchiffrer le message",
+                objectives=["Parler à Cody"],
+                reward="Code déchiffré"
+            )
+        self.add_quest(Cody_talking_quest_1)
+        self.activate_quest(Cody_talking_quest_1.title)
+        print(f"\n❗ Nouvelle quête reçue ({Cody_talking_quest_1.title}) : consultez votre compendium de quête\n")
+        self.character["Cody"].add_quest_Cody(1)

@@ -37,10 +37,10 @@ class Character:
         discussion = True
         m = 0
         if "Premier message" in self.msgs.keys():
-            print(f"\n{self.msgs.pop("Premier message")}\n")
+            print(f"\n{self.msgs.pop('Premier message')}\n")
             m = 1
         if m == 0:
-            print(f"\n{self.msgs["Présentation"]}\n")
+            print(f"\n{self.msgs['Présentation']}\n")
         
         m = 0
         dic = {}

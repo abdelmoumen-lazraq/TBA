@@ -1,7 +1,8 @@
+print(">>> PLAYER.PY CHARGÉ <<<")
 # Define the Player class.
 
 from room import Room
-
+from quest import QuestManager
 class Player():
     """
     This Class represents a player. A player is composed of a name and a current room where he is.
@@ -35,6 +36,10 @@ class Player():
         self.inventory = {}
         self.max_weight = None
         self.current_weight = 0
+        self.move_count = 0
+        self.quest_manager = QuestManager(self)
+        self.rewards = []
+
 
     # Define the move method.
     def move(self, direction):
@@ -75,6 +80,7 @@ class Player():
         print(self.current_room.get_long_description())
     #    self.get_history()
     #    self.get_Historique()
+        self.move_count += 1
         return True
 
     def get_history(self):
@@ -126,3 +132,17 @@ class Player():
                 print("\t- " + str(self.inventory[item]))
             print(f"\nEspace de stockage disponible : {self.max_weight - self.current_weight} kg\n")
             return True
+        
+    def add_reward(self, reward):
+        """Add a reward to the player."""
+        self.rewards.append(reward)
+
+    def show_rewards(self):
+        """Display all rewards earned by the player."""
+        if not self.rewards:
+            print("\n🎁 Aucune récompense obtenue pour le moment.\n")
+        else:
+            print("\n🎁 Récompenses obtenues :")
+            for reward in self.rewards:
+                print(f"  - {reward}")
+            print()

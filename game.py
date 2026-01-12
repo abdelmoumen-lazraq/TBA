@@ -8,6 +8,8 @@ from command import Command
 from actions import Actions
 from item import Item
 from character import Character
+from quest import Quest
+
 
 DEBUG = True
 
@@ -20,6 +22,7 @@ class Game:
         self.commands = {}
         self.player = None
         self.character = {}
+        
 
     # Setup the game
     def setup(self):
@@ -48,7 +51,17 @@ class Game:
         self.commands["drop"] = drop
         talk = Command("talk", " : permet d'engager la discussion avec le PNJ sélectionné en paramètre", Actions.talk, 1)
         self.commands["talk"] = talk
-        
+        quests = Command("quests", " : afficher la liste des quêtes", Actions.quests, 0)
+        self.commands["quests"] = quests
+
+        quest = Command("quest", " <titre> : afficher les détails d'une quête", Actions.quest, 1)
+        self.commands["quest"] = quest
+
+        activate = Command("activate", " <titre> : activer une quête", Actions.activate, 1)
+        self.commands["activate"] = activate
+
+        rewards = Command("rewards", " : afficher vos récompenses", Actions.rewards, 0)
+        self.commands["rewards"] = rewards
         # Setup rooms
 
         entree_nord = Room("Entrée Nord","à l’entrée principale de l’ESIEE (entrée nord), devant l'axe de la terre, où convergent étudiants et visiteurs.")
@@ -184,19 +197,70 @@ class Game:
         self.player.current_room = entree_nord
         self.player.max_weight = 20
 
+        self._setup_quests()  
 
+    def _setup_quests(self):
+        """Initialize all quests."""
+        exploration_quest = Quest(
+            title="Explorateur de l'ESIEE",
+            description="Explorez les lieux principaux de l'école.",
+            objectives=["Visiter Entrée Nord",
+                        "Visiter Hall d'accueil",
+                        "Visiter Bibliothèque"],
+            reward="Badge Explorateur"
+        )
+
+        interaction_quest = Quest(
+            title="Parler à Cody",
+            description="Engager la discussion avec Cody.",
+            objectives=["parler avec Cody"],
+            reward="Information secrète"
+        )
+
+        item_quest = Quest(
+            title="Message mystérieux",
+            description="Récupérer le papier déchiré.",
+            objectives=["prendre papier déchiré"],
+            reward="Indice important"
+        )
+
+        self.player.quest_manager.add_quest(exploration_quest)
+        self.player.quest_manager.add_quest(interaction_quest)
+        self.player.quest_manager.add_quest(item_quest)
     # Play the game
     def play(self):
+        """Main game loop."""
+
         self.setup()
         self.print_welcome()
         # Loop until the game is finished
         while not self.finished:
             # Get the command from the player
             self.process_command(input("> "))
-        return None
+            if self.loose():
+                print("\n💀 Vous avez perdu la partie. Essayez de nouveau !\n")
+                self.finished = True
+
+            elif self.win():
+                print("\nFélicitations ! Vous avez accompli toutes les quêtes du jeu et sauvé l'école !\n")
+                self.finished = True
+    def win(self):
+        """Return True if all quests are completed."""
+        return self.player.quest_manager.all_quests_completed()
+    
+    def loose(self):
+        """Return True if defeat conditions are met."""
+        if self.player.current_room.name == "Salle blanche":
+            if "papier déchiré" not in self.player.inventory:
+                print("\n💀 Vous êtes entré dans la salle blanche sans l’indice nécessaire.")
+                return True
+        return False
+
+
 
     # Process the command entered by the player
     def process_command(self, command_string) -> None:
+        """Process the command entered by the player."""
 
         # Split the command string into a list of words
         list_of_words = command_string.split(" ")
@@ -204,26 +268,30 @@ class Game:
         command_word = list_of_words[0]
 
         # If the command is not recognized, print an error message
-        if command_word not in self.commands.keys():
-            if command_word != "":
-                print(f"\nCommande '{command_word}' non reconnue. Entrez 'help' pour voir la liste des commandes disponibles.\n")
+        if command_word not in self.commands:
+            msg1 = f"\nCommande '{command_word}' non reconnue."
+            msg2 = " Entrez 'help' pour voir la liste des commandes disponibles.\n"
+            print(msg1 + msg2)
         # If the command is recognized, execute it
         else:
             command = self.commands[command_word]
             command.action(self, list_of_words, command.number_of_parameters)
 
+
     # Print the welcome message
     def print_welcome(self):
+        """Print the welcome message."""
+
         print(f"\nBienvenue {self.player.name} dans ce jeu d'aventure !")
         print("Entrez 'help' si vous avez besoin d'aide.")
-        #
+
         print(self.player.current_room.get_long_description())
     
 
 def main():
-    # Create a game object and play the game
+    """Create a game object and play the game"""
     Game().play()
-    
+
 
 if __name__ == "__main__":
     main()
